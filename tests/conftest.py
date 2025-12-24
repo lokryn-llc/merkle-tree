@@ -1,10 +1,10 @@
 """Pytest fixtures and test utilities for merkle-tree tests."""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import pytest
 
-from merkle_tree import HashableRecord, Hasher
+from merkle_tree import Hasher
 
 
 @dataclass
@@ -38,7 +38,7 @@ class ComplexRecord:
 
     def get_hash_content(self) -> bytes:
         """Return the bytes to hash for this record."""
-        return f"{self.id}:{self.name}:{self.value}".encode("utf-8")
+        return f"{self.id}:{self.name}:{self.value}".encode()
 
 
 @pytest.fixture

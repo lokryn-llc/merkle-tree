@@ -86,19 +86,23 @@ class Hasher:
         for i, record in enumerate(records):
             if i == 0:
                 if record.prev_hash != record.record_hash:
-                    breaks.append({
-                        "record_index": i,
-                        "expected_prev_hash": record.record_hash,
-                        "actual_prev_hash": record.prev_hash,
-                    })
+                    breaks.append(
+                        {
+                            "record_index": i,
+                            "expected_prev_hash": record.record_hash,
+                            "actual_prev_hash": record.prev_hash,
+                        }
+                    )
             else:
                 expected = records[i - 1].record_hash
                 if record.prev_hash != expected:
-                    breaks.append({
-                        "record_index": i,
-                        "expected_prev_hash": expected,
-                        "actual_prev_hash": record.prev_hash,
-                    })
+                    breaks.append(
+                        {
+                            "record_index": i,
+                            "expected_prev_hash": expected,
+                            "actual_prev_hash": record.prev_hash,
+                        }
+                    )
         return len(breaks) == 0, breaks
 
     @staticmethod

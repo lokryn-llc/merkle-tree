@@ -2,8 +2,6 @@
 
 import hashlib
 
-import pytest
-
 from merkle_tree import HashableRecord, Hasher
 
 from .conftest import ComplexRecord, SampleRecord
@@ -111,9 +109,7 @@ class TestHashRecord:
         for i in range(1, len(records)):
             assert records[i].prev_hash == records[i - 1].record_hash
 
-    def test_hasher_with_history_links_correctly(
-        self, hasher_with_history: Hasher
-    ) -> None:
+    def test_hasher_with_history_links_correctly(self, hasher_with_history: Hasher) -> None:
         """Record links to existing chain when hasher has history."""
         record = SampleRecord(data="new record")
         hasher_with_history.hash_record(record)
@@ -375,9 +371,7 @@ class TestVerifyBatch:
         assert stored == ""
         assert computed == ""
 
-    def test_valid_batch(
-        self, hasher: Hasher, sample_records: list[SampleRecord]
-    ) -> None:
+    def test_valid_batch(self, hasher: Hasher, sample_records: list[SampleRecord]) -> None:
         """Properly hashed batch is valid."""
         hasher.hash_batch(sample_records)
         valid, stored, computed = Hasher.verify_batch(sample_records)

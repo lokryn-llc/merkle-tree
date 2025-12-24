@@ -3,8 +3,6 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-import pytest
-
 from merkle_tree import Hasher
 
 
@@ -24,7 +22,8 @@ class AuditEntry:
     batch_merkle_root: str = ""
 
     def get_hash_content(self) -> bytes:
-        return f"{self.timestamp}|{self.user_id}|{self.action}|{self.resource}|{self.details}".encode()
+        content = f"{self.timestamp}|{self.user_id}|{self.action}|{self.resource}|{self.details}"
+        return content.encode()
 
 
 @dataclass
@@ -44,7 +43,9 @@ class Transaction:
     batch_merkle_root: str = ""
 
     def get_hash_content(self) -> bytes:
-        return f"{self.tx_id}|{self.from_account}|{self.to_account}|{self.amount}|{self.currency}|{self.timestamp}".encode()
+        parts = [self.tx_id, self.from_account, self.to_account]
+        parts.extend([str(self.amount), self.currency, self.timestamp])
+        return "|".join(parts).encode()
 
 
 class TestAuditLogWorkflow:
@@ -79,7 +80,7 @@ class TestAuditLogWorkflow:
             ),
         ]
 
-        merkle_root_1 = hasher.hash_batch(batch1)
+        hasher.hash_batch(batch1)
         last_hash_session_1 = hasher.last_hash
 
         # Verify batch 1 integrity
@@ -109,7 +110,7 @@ class TestAuditLogWorkflow:
             ),
         ]
 
-        merkle_root_2 = hasher2.hash_batch(batch2)
+        hasher2.hash_batch(batch2)
 
         # Verify batch 2 chains to batch 1
         assert batch2[0].prev_hash == batch1[-1].record_hash
@@ -268,10 +269,10 @@ class TestFinancialTransactionWorkflow:
             Transaction(
                 tx_id=f"AM{i:03d}",
                 from_account=f"ACC{i:03d}",
-                to_account=f"ACC{(i+1):03d}",
+                to_account=f"ACC{(i + 1):03d}",
                 amount=Decimal(f"{100 * (i + 1)}.00"),
                 currency="USD",
-                timestamp=f"2024-01-15T0{8+i}:00:00Z",
+                timestamp=f"2024-01-15T0{8 + i}:00:00Z",
             )
             for i in range(3)
         ]
@@ -282,11 +283,11 @@ class TestFinancialTransactionWorkflow:
         afternoon_batch = [
             Transaction(
                 tx_id=f"PM{i:03d}",
-                from_account=f"ACC{i+10:03d}",
-                to_account=f"ACC{i+11:03d}",
+                from_account=f"ACC{i + 10:03d}",
+                to_account=f"ACC{i + 11:03d}",
                 amount=Decimal(f"{200 * (i + 1)}.00"),
                 currency="USD",
-                timestamp=f"2024-01-15T{14+i}:00:00Z",
+                timestamp=f"2024-01-15T{14 + i}:00:00Z",
             )
             for i in range(3)
         ]
@@ -360,7 +361,7 @@ class TestRecoveryScenarios:
         hasher = Hasher()
         stored_entries = [
             AuditEntry(
-                timestamp=f"2024-01-{i+1:02d}T12:00:00Z",
+                timestamp=f"2024-01-{i + 1:02d}T12:00:00Z",
                 user_id="auditor",
                 action="REVIEW",
                 resource=f"report_{i}",
@@ -383,5 +384,5 @@ class TestRecoveryScenarios:
         assert stored_root == expected_merkle_root
 
         # Verify individual hashes
-        for entry, expected_hash in zip(stored_entries, expected_hashes):
+        for entry, expected_hash in zip(stored_entries, expected_hashes, strict=True):
             assert entry.record_hash == expected_hash
