@@ -1,5 +1,5 @@
 [project]
-name = "merkle-tree"
+name = "lokryn-merkle-tree"
 version = "0.1.0"
 description = "Merkle tree and hash chain utilities for immutable audit logs"
 readme = "README.md"

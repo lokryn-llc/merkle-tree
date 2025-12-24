@@ -13,13 +13,13 @@ Merkle tree and hash chain utilities for immutable audit logs.
 ## Installation
 
 ```bash
-pip install merkle-tree
+pip install lokryn-merkle-tree
 ```
 
 Or with uv:
 
 ```bash
-uv add merkle-tree
+uv add lokryn-merkle-tree
 ```
 
 ## Quick Start
